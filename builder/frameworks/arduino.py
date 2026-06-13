@@ -26,7 +26,8 @@ PlatformIO/SCons:
   - Adds the standard Arduino defines (ARDUINO, ARDUINO_ARCH_LPC8XX,
     ARDUINO_<BOARD>, F_CPU) plus board-level extras from
     `boards/<id>.json` -> build.extra_flags (e.g., -DCPU_LPC845M301JBD48).
-  - Picks the linker script from `board.build.ldscript`.
+  - Picks the linker script: `board_build.ldscript` override if present,
+    else the framework's per-MCU default (so none need be specified).
   - Builds two static libs (variant + core) and prepends them to LIBS so
     they win over any same-named symbols from user code.
 """
@@ -124,12 +125,27 @@ if os.path.isdir(LIBRARIES_DIR):
 if board.get("build.extra_flags", ""):
     env.ProcessFlags(board.get("build.extra_flags"))
 
-# Linker script: `board_build.ldscript` from platformio.ini wins, otherwise
-# whatever the board JSON declares. The path may use ${platformio.packages_dir}
-# style references; PIO expands $PACKAGE / $PROJECT vars via env.subst.
+# Linker script. Resolution order:
+#   1. An explicit `board_build.ldscript` (platformio.ini) or a `build.ldscript`
+#      baked into the board JSON wins as-is.
+#   2. Otherwise fall back to the framework's per-MCU default, so a stock board
+#      links with no linker script specified anywhere by the user.
+# The framework default is an absolute path under FRAMEWORK_DIR (resolves
+# regardless of build CWD); its own root-relative `INCLUDE` directives are
+# satisfied by the FRAMEWORK_DIR entry added to LIBPATH below.
+FRAMEWORK_LDSCRIPTS = {
+    "lpc845": "linker_scripts/gcc/lpc845_flash.ld",
+    "lpc804": "linker_scripts/gcc/lpc804_flash.ld",
+}
 ldscript = board.get("build.ldscript", "")
-if ldscript:
-    env.Replace(LDSCRIPT_PATH=env.subst(ldscript))
+if not ldscript:
+    mcu = board.get("build.mcu", "").lower()
+    default_ldscript = FRAMEWORK_LDSCRIPTS.get(mcu)
+    assert default_ldscript, (
+        "No default linker script for MCU %r; set board_build.ldscript in "
+        "platformio.ini or add a FRAMEWORK_LDSCRIPTS entry." % mcu)
+    ldscript = os.path.join(FRAMEWORK_DIR, default_ldscript)
+env.Replace(LDSCRIPT_PATH=env.subst(ldscript))
 
 # GNU ld resolves `INCLUDE <file>` directives against its -L search dirs and the
 # CWD, not relative to the script that contains the INCLUDE. The framework

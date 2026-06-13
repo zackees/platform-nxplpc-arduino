@@ -4,7 +4,6 @@
     "cpu": "cortex-m0plus",
     "extra_flags": "-DCPU_LPC845M301JBD64 -D__LPC845__ -DLPC845 -DARDUINO_LPCXPRESSO845MAX",
     "f_cpu": "30000000L",
-    "ldscript": "$PROJECT_PACKAGES_DIR/framework-arduino-lpc8xx/linker_scripts/gcc/lpc845_flash.ld",
     "mcu": "lpc845",
     "variant": "lpcxpresso845max"
   },
