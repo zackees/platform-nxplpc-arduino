@@ -131,6 +131,13 @@ ldscript = board.get("build.ldscript", "")
 if ldscript:
     env.Replace(LDSCRIPT_PATH=env.subst(ldscript))
 
+# GNU ld resolves `INCLUDE <file>` directives against its -L search dirs and the
+# CWD, not relative to the script that contains the INCLUDE. The framework
+# linker scripts use framework-root-relative includes (e.g.
+# `INCLUDE linker_scripts/gcc/lpc8xx_common.ld`), so the framework root must be
+# on the linker search path for those scripts to link from any project dir.
+env.Append(LIBPATH=[FRAMEWORK_DIR])
+
 #
 # Build variant + core as static libraries.
 # Variant is prepended ahead of core so variant-specific symbols (pin maps,
