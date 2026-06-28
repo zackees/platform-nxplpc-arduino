@@ -2,7 +2,7 @@
   "name": "nxplpc-arduino",
   "title": "NXP LPC (Arduino)",
   "description": "NXP LPC8xx Cortex-M0+ Arduino-framework support, forked from platformio/platform-nxplpc. Adds the Arduino framework binding so LPC804/LPC845 boards can be built with `framework = arduino` using the ArduinoCore-LPC8xx package.",
-  "homepage": "https://github.com/zackees/platform-nxplpc-arduino",
+  "homepage": "https://github.com/FastLED/platform-nxp-lpc8xx",
   "license": "Apache-2.0",
   "keywords": [
     "dev-platform",
@@ -19,7 +19,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/zackees/platform-nxplpc-arduino.git"
+    "url": "https://github.com/FastLED/platform-nxp-lpc8xx.git"
   },
   "version": "0.2.0",
   "frameworks": {
@@ -40,7 +40,7 @@
     "framework-arduino-lpc8xx": {
       "type": "framework",
       "optional": true,
-      "version": "https://github.com/zackees/ArduinoCore-LPC8xx.git#50d76e0d63c2d2a2b365b29de47100d93c530c83"
+      "version": "https://github.com/FastLED/framework-arduino-lpc8xx.git#50d76e0d63c2d2a2b365b29de47100d93c530c83"
     },
     "tool-openocd": {
       "type": "debugger",
