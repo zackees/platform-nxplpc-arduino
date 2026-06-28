@@ -21,7 +21,7 @@
     "type": "git",
     "url": "https://github.com/zackees/platform-nxplpc-arduino.git"
   },
-  "version": "0.1.0",
+  "version": "0.2.0",
   "frameworks": {
     "arduino": {
       "package": "framework-arduino-lpc8xx",
@@ -40,7 +40,7 @@
     "framework-arduino-lpc8xx": {
       "type": "framework",
       "optional": true,
-      "version": "https://github.com/zackees/ArduinoCore-LPC8xx.git"
+      "version": "https://github.com/zackees/ArduinoCore-LPC8xx.git#50d76e0d63c2d2a2b365b29de47100d93c530c83"
     },
     "tool-openocd": {
       "type": "debugger",
