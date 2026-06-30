@@ -55,6 +55,19 @@ CORE_DIR = os.path.join(FRAMEWORK_DIR, "cores", CORE)
 VARIANT_DIR = os.path.join(FRAMEWORK_DIR, "variants", VARIANT)
 LIBRARIES_DIR = os.path.join(FRAMEWORK_DIR, "libraries")
 
+# The CMSIS device PAL (LPC845.h / system_LPC845.h, LPC804.h / ...) is a
+# chip-level artifact keyed on build.mcu, not on the board-pins variant. It
+# lives in variants/<mcu>/, which is usually a *different* directory than the
+# selected board variant (e.g. mcu=lpc845 ships the PAL in variants/lpc845/
+# while board lpc845brk selects variants/lpc845brk/). Add it to CPPPATH so a
+# board on a given MCU can #include the vendor device header regardless of
+# which pins variant it selects. CMSIS-Core (core_cm0plus.h, cmsis_gcc.h, ...)
+# is pulled in transitively by the device header and ships once at the
+# framework root in CMSIS/.
+MCU = board.get("build.mcu", "")
+CMSIS_DIR = os.path.join(FRAMEWORK_DIR, "variants", MCU) if MCU else ""
+CMSIS_CORE_DIR = os.path.join(FRAMEWORK_DIR, "CMSIS")
+
 assert os.path.isdir(CORE_DIR), (
     "Arduino core directory missing: %s" % CORE_DIR)
 assert os.path.isdir(VARIANT_DIR), (
@@ -102,7 +115,13 @@ env.Append(
     CPPPATH=[
         CORE_DIR,
         VARIANT_DIR,
-    ],
+    ] + (
+        [CMSIS_DIR]
+        if CMSIS_DIR and CMSIS_DIR != VARIANT_DIR and os.path.isdir(CMSIS_DIR)
+        else []
+    ) + (
+        [CMSIS_CORE_DIR] if os.path.isdir(CMSIS_CORE_DIR) else []
+    ),
 
     LINKFLAGS=machine_flags + [
         "-Os",
